@@ -18,7 +18,7 @@ public class TagWordCounter {
 
     public static void getTagWordCount() throws IOException {
         Logger.getLogger("org").setLevel(Level.ERROR);
-        SparkConf conf = new SparkConf().setAppName("tagCounts").setMaster("local[6]");
+        SparkConf conf = new SparkConf().setAppName("tagCounts").setMaster("local[3]");
         JavaSparkContext sparkContext = new JavaSparkContext(conf);
         
         JavaRDD<String> videos = sparkContext.textFile("USvideos.csv");
@@ -31,8 +31,8 @@ public class TagWordCounter {
         JavaRDD<String> words = tags.flatMap(tag -> Arrays.asList(tag
                 .toLowerCase()
                 .trim()
-                .replaceAll("\\p{Punct}", " ")
-                .split(" ")).iterator());
+                
+                .split("//|")).iterator());
         System.out.println(words.toString());
         
         
@@ -49,7 +49,7 @@ public class TagWordCounter {
     private static String extractTag(String videoLine) {
         try {
             String str = videoLine.split(COMMA_DELIMITER)[6];
-            return str.split(COMMA_DELIMITER)[0];
+            return str;
         } catch (ArrayIndexOutOfBoundsException e) {
             return "";
         }
