@@ -17,39 +17,35 @@ public class TagWordCounter {
     private static final String COMMA_DELIMITER = ",";
 
     public static void getTagWordCount() throws IOException {
-        Logger.getLogger("org").setLevel(Level.ERROR);
-        SparkConf conf = new SparkConf().setAppName("tagCounts").setMaster("local[3]");
-        JavaSparkContext sparkContext = new JavaSparkContext(conf);
-        
+        Logger.getLogger ("org").setLevel (Level.ERROR);
+        SparkConf conf = new SparkConf ().setAppName ("wordCounts").setMaster ("local[3]");
+        JavaSparkContext sparkContext = new JavaSparkContext (conf);
         JavaRDD<String> videos = sparkContext.textFile("USvideos.csv");
 
-        JavaRDD<String> tags = videos
-                .map(TagWordCounter::extractTag)
-                .filter(StringUtils::isNotBlank);
+       JavaRDD<String> tags = videos
+                .map (TagWordCounter::extractTag)
+                .filter (StringUtils::isNotBlank);
         
         
-        JavaRDD<String> words = tags.flatMap(tag -> Arrays.asList(tag
-                .toLowerCase()
-                .trim()
-                
-                .split("//|")).iterator());
-        System.out.println(words.toString());
+         JavaRDD<String> words = tags.flatMap (tag -> Arrays.asList (tag
+                .toLowerCase ()
+                .trim ()
+                .split ("\\|")).iterator ());
+        System.out.println(words.toString ());
         
         
-        Map<String, Long> wordCounts = words.countByValue();
-        
-        
-        List<Map.Entry> sorted = wordCounts.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
+        Map<String, Long> wordCounts = words.countByValue ();
+        List<Map.Entry> sorted = wordCounts.entrySet ().stream ()
+                .sorted (Map.Entry.comparingByValue ()).collect (Collectors.toList ());
+        // DISPLAY
         for (Map.Entry<String, Long> entry : sorted) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
+            System.out.println (entry.getKey () + " : " + entry.getValue ());
         }
     }
 
-    private static String extractTag(String videoLine) {
+    public static String extractTag(String videoLine) {
         try {
-            String str = videoLine.split(COMMA_DELIMITER)[6];
-            return str;
+            return (videoLine.split(COMMA_DELIMITER)[6]);
         } catch (ArrayIndexOutOfBoundsException e) {
             return "";
         }
